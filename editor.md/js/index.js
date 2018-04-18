@@ -36,7 +36,7 @@ $(function() {
     //GetHistoryDrafts(0);
     var indexMarkdownEditor;
     
-    $.get('./index.md', function(md){
+    $.get('./blog_default.md', function(md){
         indexMarkdownEditor = editormd("index-editormd", {
             height           : 820,
             autoHeight : true,
@@ -139,12 +139,12 @@ $(function() {
 
         if(0 == site_type_index || 0 == article_type_index)
         {
-            $('#history_draft').append('<option>无草稿</option>');
+            $('#history_draft').append('<option>新建草稿</option>');
             $("#history_draft").get(0).selectedIndex = 0;
         }
         else
         {
-            $('#history_draft').append('<option>请选择文章</option>');
+            $('#history_draft').append('<option>新建草稿</option>');
             var site_type = $("#site_type").val();
             var article_type = $("#article_type").val();
 
@@ -160,11 +160,15 @@ $(function() {
 
 	    });
    	}
+        if(1 == site_type_index)
+	    ReloadMD('blog_default.md');
+        else if(2 == site_type_index)
+	    ReloadMD('wiki_default.md');
     }
     
-    function ReloadMD()
+    function ReloadMD(filename)
     {
-        $.get('./test.md', function(md){
+        $.get(filename, function(md){
             indexMarkdownEditor.setMarkdown(md);
         });
     }
