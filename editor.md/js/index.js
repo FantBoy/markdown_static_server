@@ -33,7 +33,7 @@ $(function() {
         }
     });
     
-    GetHistoryDrafts();
+    //GetHistoryDrafts(0);
     var indexMarkdownEditor;
     
     $.get('./index.md', function(md){
@@ -64,49 +64,108 @@ $(function() {
             }
         });
     });
+
+    $('#site_type').bind('change', function(){
+    	GetHistoryDrafts();
+    });
     
-    $("#get-md-btn").bind('click', function(){
+    $('#article_type').bind('change', function(){
+        GetHistoryDrafts();
+    });    
+    
+    $("#up-md-btn").bind('click', function(){
+ 	PostArticle(0);
+    });
+    
+    $("#upandrelease-md-btn").bind('click', function(){
+	PostArticle(1);
+    });
+
+    $("#history_draft").bind('change', function(){
+    	var articel_index = $("#history_draft").get(0).selectedIndex;
+        if(0 != articel_index)
+	{
+            var article_name = $("#history_draft").val();
+            $.get(article_name, function(md){
+                indexMarkdownEditor.setMarkdown(md);
+            });
+	}
+    });    
+
+    function PostArticle(post_type)
+    {
                 var site_type_index = $("#site_type").get(0).selectedIndex;
                 var article_type_index = $("#article_type").get(0).selectedIndex;
+		var articel_index = $("#history_draft").get(0).selectedIndex;
                 if(0 == site_type_index || 0 == article_type_index)
                 {
 		    alert("please select site_type and article_type!");
                 }
+		else if(0 == articel_index && 2 != article_type_index)
+		{
+		    alert("new article must post to draft_type!");
+		}
 		else
 		{
         		console.log(site_type_index);                
 			var site_type = $("#site_type").val();
 			var article_type = $("#article_type").val();
+			var article_name = $("#history_draft").val();
+			if(0 == articel_index)
+			{
+			    article_name = '';
+			}
                         var md_data = indexMarkdownEditor.getMarkdown();
         		$.post("http://bearboyxu.cn:3000/upload/postmd?type=addmd",
         		    {
         			site_type: site_type,
 				article_type: article_type,
+				article_name: article_name,
+				post_type: post_type, // 0 upload, 1 upload and release
         			md_data: md_data
         		    },
         		    function(data,status){
         			alert("数据：" + data + "\n状态：" + status);
           		});
 		}
-            });
+    }
+   
+    function GetHistoryDrafts()
+    {
 
-    function GetHistoryDrafts(){
-        
-    	$.get("http://bearboyxu.cn:3000/upload/gethistorydrafts", function(data, status){
-		//alert(data['drafts']);
-		//$("#select_id").append("<option value='Value'>Text</option>"); 
-		res_data = JSON.parse(data);
-		console.log(res_data['drafts']);
-                $.each(res_data['drafts']['BLOG'], function( index, val ){
-			var text = "[BLOG] " + val;
-			$("#history_draft").append("<option value='" + val + "'>" + text + "</option>");	
-		});
+	$('#history_draft').children().remove();
+        var article_type_index = $("#article_type").get(0).selectedIndex;
+        var site_type_index = $("#site_type").get(0).selectedIndex;
 
-                $.each(res_data['drafts']['WIKI'], function( index, val ){
-			var text = "[WIKI] " + val;
-			$("#history_draft").append("<option value='" + val + "'>" + text + "</option>");	
-		});
+        if(0 == site_type_index || 0 == article_type_index)
+        {
+            $('#history_draft').append('<option>无草稿</option>');
+            $("#history_draft").get(0).selectedIndex = 0;
+        }
+        else
+        {
+            $('#history_draft').append('<option>请选择文章</option>');
+            var site_type = $("#site_type").val();
+            var article_type = $("#article_type").val();
 
-	});
+            var url = "http://bearboyxu.cn:3000/upload/gethistorydrafts?site_type=" + site_type + "&article_type=" + article_type; 
+    	    $.get(url, function(data, status){
+	    	//alert(data['drafts']);
+	    	//$("#select_id").append("<option value='Value'>Text</option>"); 
+	    	res_data = JSON.parse(data);
+                $.each(res_data['articles'], function( index, val ){
+	   	    $("#history_draft").append("<option value='" + val + "'>" + val + "</option>");	
+	    	});
+
+
+	    });
+   	}
+    }
+    
+    function ReloadMD()
+    {
+        $.get('./test.md', function(md){
+            indexMarkdownEditor.setMarkdown(md);
+        });
     }
 });
