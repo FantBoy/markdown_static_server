@@ -116,7 +116,7 @@ $(function() {
 			    article_name = '';
 			}
                         var md_data = indexMarkdownEditor.getMarkdown();
-        		$.post("http://bearboyxu.cn:3000/upload/postmd?type=addmd",
+        		$.post("http://bearboyxu.cn/upload/postmd?type=addmd",
         		    {
         			site_type: site_type,
 				article_type: article_type,
@@ -148,7 +148,7 @@ $(function() {
             var site_type = $("#site_type").val();
             var article_type = $("#article_type").val();
 
-            var url = "http://bearboyxu.cn:3000/upload/gethistorydrafts?site_type=" + site_type + "&article_type=" + article_type; 
+            var url = "http://bearboyxu.cn/upload/gethistorydrafts?site_type=" + site_type + "&article_type=" + article_type; 
     	    $.get(url, function(data, status){
 	    	//alert(data['drafts']);
 	    	//$("#select_id").append("<option value='Value'>Text</option>"); 
